@@ -9,9 +9,29 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@radix-ui/react-avatar": "^1.1.11",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@streamdown/cjk": "^1.0.2",
+    "@streamdown/math": "^1.0.2",
+    "@streamdown/mermaid": "^1.0.2",
+    "@types/katex": "^0.16.8",
+    "@types/recharts": "^1.8.29",
+    "@types/three": "^0.183.1",
+    "axios": "^1.13.5",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.34.3",
+    "katex": "^0.16.33",
+    "lucide-react": "^0.575.0",
+    "motion": "^12.34.3",
     "next": "16.1.6",
+    "postprocessing": "^6.38.3",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "recharts": "^3.7.0",
+    "streamdown": "^2.3.0",
+    "tailwind-merge": "^3.5.0",
+    "three": "^0.183.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
