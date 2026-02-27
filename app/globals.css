@@ -24,3 +24,212 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ─── Chat scrollbar ─── */
+.chat-scrollable::-webkit-scrollbar {
+  width: 5px;
+}
+
+.chat-scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-scrollable::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.3);
+  border-radius: 999px;
+}
+
+.chat-scrollable::-webkit-scrollbar-thumb:hover {
+  background: rgba(128, 128, 128, 0.5);
+}
+
+/* ─── Chat Prose — GPT-like markdown rendering ─── */
+.chat-prose {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--foreground);
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Headings */
+.chat-prose h1 {
+  font-size: 1.15em;
+  font-weight: 700;
+  margin: 0.8em 0 0.4em;
+  line-height: 1.3;
+  color: var(--foreground);
+}
+
+.chat-prose h2 {
+  font-size: 1.05em;
+  font-weight: 700;
+  margin: 0.7em 0 0.35em;
+  line-height: 1.35;
+  color: var(--foreground);
+}
+
+.chat-prose h3 {
+  font-size: 0.95em;
+  font-weight: 600;
+  margin: 0.6em 0 0.3em;
+  line-height: 1.4;
+  color: var(--foreground);
+}
+
+.chat-prose h4,
+.chat-prose h5,
+.chat-prose h6 {
+  font-size: 0.9em;
+  font-weight: 600;
+  margin: 0.5em 0 0.25em;
+  color: var(--foreground);
+}
+
+/* Paragraphs */
+.chat-prose p {
+  margin: 0.4em 0;
+}
+
+.chat-prose p:first-child {
+  margin-top: 0;
+}
+
+.chat-prose p:last-child {
+  margin-bottom: 0;
+}
+
+/* Bold & italic */
+.chat-prose strong {
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.chat-prose em {
+  font-style: italic;
+}
+
+/* Links */
+.chat-prose a {
+  color: #3b82f6;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.chat-prose a:hover {
+  color: #2563eb;
+}
+
+/* Lists */
+.chat-prose ul {
+  list-style-type: disc;
+  padding-left: 1.4em;
+  margin: 0.4em 0;
+}
+
+.chat-prose ol {
+  list-style-type: decimal;
+  padding-left: 1.4em;
+  margin: 0.4em 0;
+}
+
+.chat-prose li {
+  margin: 0.15em 0;
+  padding-left: 0.2em;
+}
+
+.chat-prose li>ul,
+.chat-prose li>ol {
+  margin: 0.1em 0;
+}
+
+/* Tables — clean minimal style */
+.chat-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.8em 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  border: 1px solid rgba(128, 128, 128, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  display: table;
+}
+
+.chat-prose thead {
+  background: rgba(128, 128, 128, 0.06);
+}
+
+.chat-prose th {
+  font-weight: 600;
+  text-align: left;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+  color: var(--foreground);
+  font-size: 12px;
+}
+
+.chat-prose td {
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+  color: var(--foreground);
+}
+
+.chat-prose tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.chat-prose tbody tr:hover {
+  background: rgba(128, 128, 128, 0.04);
+}
+
+/* Code */
+.chat-prose code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+  background: rgba(128, 128, 128, 0.12);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.chat-prose pre {
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 0.5em 0;
+  overflow-x: auto;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.chat-prose pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+
+/* Blockquotes */
+.chat-prose blockquote {
+  border-left: 3px solid #3b82f6;
+  padding: 0.3em 0.8em;
+  margin: 0.5em 0;
+  color: var(--foreground);
+  opacity: 0.85;
+  background: rgba(59, 130, 246, 0.05);
+  border-radius: 0 6px 6px 0;
+}
+
+/* Horizontal rule */
+.chat-prose hr {
+  border: none;
+  border-top: 1px solid rgba(128, 128, 128, 0.2);
+  margin: 0.6em 0;
+}
+
+/* Images */
+.chat-prose img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 0.4em 0;
+}

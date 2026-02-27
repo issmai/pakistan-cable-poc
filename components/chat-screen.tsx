@@ -177,7 +177,7 @@ export function ChatScreen({ className }: { className?: string }) {
             /* Centered info when no messages – chat with Indus AI Buddy, Indus AI Week */
             <div className="flex min-h-full flex-col items-center justify-center py-12 text-center">
               <motion.div
-                className="mx-auto max-w-lg space-y-4"
+                className="mx-auto max-w-md space-y-4"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
@@ -203,7 +203,7 @@ export function ChatScreen({ className }: { className?: string }) {
             </div>
           ) : (
             <motion.div
-              className="mx-auto w-full max-w-3xl"
+              className="mx-auto w-full"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
@@ -269,7 +269,7 @@ export function ChatScreen({ className }: { className?: string }) {
 
         {/* Input bar – always fixed at bottom, no top border */}
         <div className="shrink-0 bg-background/95 pt-3  backdrop-blur supports-backdrop-filter:bg-background/80 sm:px-4 sm:pt-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] sm:pb-[max(1rem,env(safe-area-inset-bottom))]">
-          <div className="mx-auto w-full max-w-3xl sm:max-w-4xl px-3">
+          <div className="mx-auto w-full px-3">
             <div className="relative flex flex-col w-full gap-2">
               <div className="relative w-full">
                 <Textarea
