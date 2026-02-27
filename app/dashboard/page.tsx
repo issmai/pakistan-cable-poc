@@ -178,7 +178,6 @@ export default function DashboardPage() {
     const metal = METALS.find(m => m.id === sel) as Metal;
     const chartData = CHART_DATA[sel];
     const diff = metal.price - metal.prev;
-    const pct = ((diff / metal.prev) * 100).toFixed(2);
     const up = diff >= 0;
 
     const urgencyStyle: Record<string, { bg: string; border: string; color: string; label: string }> = {
@@ -431,12 +430,6 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {/* Footer */}
-                <div style={{ textAlign: "center", marginTop: 24, padding: "14px 0", borderTop: "1px solid #1a2a3a" }}>
-                    <span style={{ fontSize: 10, fontFamily: "JetBrains Mono, monospace", color: "#1e3a5f", letterSpacing: 2 }}>
-                        LME PROCUREMENT INTELLIGENCE · POC · POWERED BY wAI INDUSTRIES · DATA: LME.COM + KITCO
-                    </span>
-                </div>
 
             </div>
         </>

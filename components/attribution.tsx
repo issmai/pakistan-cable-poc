@@ -10,7 +10,6 @@ export function Attribution() {
   return (
     <div
       className="fixed bottom-4 right-4 z-20 flex items-center gap-1.5 text-[10px] text-foreground sm:bottom-6 sm:right-6 sm:gap-2 sm:text-xs"
-      aria-label="Powered by wAI"
     >
       <div className="relative h-5 w-12 shrink-0">
         <Image
@@ -21,7 +20,6 @@ export function Attribution() {
           sizes="48px"
         />
       </div>
-      <span className="opacity-60">Powered by wAI</span>
     </div>
   );
 }

@@ -232,6 +232,7 @@ export function ChatScreen({ className }: { className?: string }) {
                         <div className="chat-markdown">
                           <Streamdown
                             shikiTheme={["github-dark", "github-light"]}
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             {...({ plugins: { mermaid, math, cjk } } as any)}
                           >
                             {msg.content}
@@ -344,10 +345,8 @@ export function ChatScreen({ className }: { className?: string }) {
                   </AnimatePresence>
                 </div>
               </div>
-              {/* Powered by wAI – centered below input */}
               <div
                 className="flex justify-center items-center gap-1.5 text-[10px] text-muted-foreground sm:text-xs py-1"
-                aria-label="Powered by wAI"
               >
                 <div className="relative h-4 w-10 shrink-0 sm:h-5 sm:w-12">
                   <Image
@@ -358,7 +357,6 @@ export function ChatScreen({ className }: { className?: string }) {
                     sizes="48px"
                   />
                 </div>
-                <span className="opacity-60">Powered by wAI</span>
               </div>
             </div>
           </div>

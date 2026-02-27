@@ -21,6 +21,7 @@ import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ViewProvider } from "@/components/view-context";
 import { AiAgentModal } from "@/components/ai-agent-modal";
+import { FloatingAgentButton } from "@/components/floating-agent-button";
 
 export default function RootLayout({
   children,
@@ -36,6 +37,7 @@ export default function RootLayout({
           <ViewProvider>
             <Navbar />
             <AiAgentModal />
+            <FloatingAgentButton />
             <main className="pt-16 min-h-screen">
               {children}
             </main>
