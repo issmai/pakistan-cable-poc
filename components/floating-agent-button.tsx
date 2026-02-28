@@ -10,7 +10,7 @@ export function FloatingAgentButton() {
         <button
             onClick={() => setIsAgentOpen(!isAgentOpen)}
             title={isAgentOpen ? "Close AI Agent" : "Open AI Agent"}
-            className="fixed bottom-6 right-6 z-[110] flex items-center justify-center p-4 rounded-full bg-linear-to-tr from-blue-600 to-indigo-600 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 group cursor-pointer"
+            className="fixed bottom-6 right-6 z-[110] flex items-center justify-center p-4 rounded-full bg-linear-to-tr from-blue-500 to-emerald-500 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 group cursor-pointer"
         >
             <div className="relative w-6 h-6">
                 {/* Bot icon — visible when chat is closed */}

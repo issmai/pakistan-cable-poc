@@ -24,7 +24,7 @@ export default function Sidebar() {
         <aside className="fixed left-0 top-0 h-screen w-64 bg-zinc-900 text-white shadow-xl flex flex-col border-r border-zinc-800">
             <div className="p-6">
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
-                    Chatbot UI
+                    Pakistan Cable
                 </h1>
             </div>
 
@@ -36,8 +36,8 @@ export default function Sidebar() {
                             key={item.href}
                             href={item.href}
                             className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${isActive
-                                    ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20"
-                                    : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                                ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20"
+                                : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
                                 }`}
                         >
                             <item.icon
