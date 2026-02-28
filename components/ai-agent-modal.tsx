@@ -168,7 +168,7 @@ export function AiAgentModal() {
                                     <Cable className="w-4 h-4 text-emerald-400" />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-[13px] font-semibold text-zinc-100">Pakistan Cable Chatbot</span>
+                                    <span className="text-[13px] font-semibold text-zinc-100">Assistant</span>
                                     <span className="text-[10px] text-emerald-400/80 flex items-center gap-1">
                                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                                         Online
@@ -194,7 +194,7 @@ export function AiAgentModal() {
                                 </div>
                                 <div>
                                     <p className="text-sm font-semibold text-zinc-200">
-                                        Pakistan Cable Chatbot
+                                        Assistant
                                     </p>
                                     <p className="text-xs text-zinc-500 mt-2 leading-relaxed max-w-[260px]">
                                         Ask about procurement trends, pricing analysis, inventory forecasts, and more.
@@ -319,19 +319,7 @@ export function AiAgentModal() {
                         </form>
                     </div>
 
-                    {/* ── Powered by ── */}
-                    <div className="flex justify-center items-center gap-1.5 py-1.5 bg-zinc-900/80 border-t border-zinc-800/30">
-                        <span className="text-[9px] text-zinc-600">Powered by</span>
-                        <div className="relative h-3 w-7 shrink-0">
-                            <Image
-                                src={theme === "dark" ? "/logo-white.png" : "/logo-black.png"}
-                                alt="wAI"
-                                fill
-                                className="object-contain opacity-40"
-                                sizes="28px"
-                            />
-                        </div>
-                    </div>
+
                 </motion.div>
             )}
         </AnimatePresence>

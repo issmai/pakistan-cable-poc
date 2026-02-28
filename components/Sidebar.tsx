@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, Bot } from "lucide-react";
 
@@ -23,9 +24,14 @@ export default function Sidebar() {
     return (
         <aside className="fixed left-0 top-0 h-screen w-64 bg-zinc-900 text-white shadow-xl flex flex-col border-r border-zinc-800">
             <div className="p-6">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
-                    Pakistan Cable
-                </h1>
+                <Image
+                    src="/alara-logo.png"
+                    alt="Alara"
+                    width={140}
+                    height={45}
+                    className="invert mix-blend-lighten"
+                    priority
+                />
             </div>
 
             <nav className="flex-1 px-4 space-y-2 mt-4">
