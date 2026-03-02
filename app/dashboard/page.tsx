@@ -207,15 +207,9 @@ export default function DashboardPage() {
                 {/* HEADER */}
                 <div className="fade fade1" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
                     <div>
-                        <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5, color: "#f1f5f9" }}>LME Procurement Intelligence</div>
-                        <div style={{ fontSize: 11, color: "#475569", marginTop: 4, fontFamily: "JetBrains Mono, monospace", letterSpacing: 1.5, textTransform: "uppercase" }}>
-                            PCL · Price Forecast & Order Timing Engine · POC v1.0
-                        </div>
+                        <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5, color: "#f1f5f9" }}>Dashboard</div>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, fontFamily: "JetBrains Mono, monospace", color: "#475569" }}>
-                        <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#34d399", animation: "pulse 2s infinite" }} />
-                        Live · {tick % 2 === 0 ? "Just updated" : "Refreshing..."} · Sources: LME.com &amp; Kitco
-                    </div>
+
                 </div>
 
                 {/* TICKER ROW */}
