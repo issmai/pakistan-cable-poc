@@ -5,6 +5,7 @@ import {
     Area, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, ReferenceLine, ComposedChart,
 } from "recharts";
+import { Edit2, Check } from "lucide-react";
 
 /* ─── TYPES ────────────────────────────────────────────────────────────────── */
 
@@ -35,15 +36,17 @@ interface ProcurementItem {
 }
 
 interface Recommendation {
+    id: string;
     metal: string;
     symbol: string;
     urgency: "high" | "medium" | "low";
     confidence: number;
+    basePrice: number;
     currentPrice: number;
     projectedPrice: number;
     priceRisk: string;
     window: string;
-    qty: string;
+    qty: number;
     color: string;
     rationale: string;
 }
@@ -131,21 +134,24 @@ const PROCUREMENT: ProcurementItem[] = [
 
 const RECS: Recommendation[] = [
     {
+        id: "cu-1",
         metal: "Copper", symbol: "CU", urgency: "high", confidence: 87,
-        currentPrice: 9412, projectedPrice: 9820, priceRisk: "+4.3%",
-        window: "Feb – Mar 2025", qty: "500 MT", color: "#f0a500",
+        basePrice: 9412, currentPrice: 9412, projectedPrice: 9820, priceRisk: "+4.3%",
+        window: "Feb – Mar 2025", qty: 500, color: "#f0a500",
         rationale: "Price trending upward +8% over 6 months. PCL requirement of 500 MT due Mar. Lock in now before Q2 surge.",
     },
     {
+        id: "al-1",
         metal: "Aluminium", symbol: "AL", urgency: "low", confidence: 72,
-        currentPrice: 2287, projectedPrice: 2235, priceRisk: "−2.3%",
-        window: "Apr 2025", qty: "200 MT", color: "#38bdf8",
+        basePrice: 2287, currentPrice: 2287, projectedPrice: 2235, priceRisk: "−2.3%",
+        window: "Apr 2025", qty: 200, color: "#38bdf8",
         rationale: "Forecast shows a dip in Mar–Apr. Defer order by 6–8 weeks to capitalize on lower prices.",
     },
     {
+        id: "ni-1",
         metal: "Nickel", symbol: "NI", urgency: "medium", confidence: 61,
-        currentPrice: 15840, projectedPrice: 16200, priceRisk: "+2.3%",
-        window: "Mar – Apr 2025", qty: "80 MT", color: "#a78bfa",
+        basePrice: 15840, currentPrice: 15840, projectedPrice: 16200, priceRisk: "+2.3%",
+        window: "Mar – Apr 2025", qty: 80, color: "#a78bfa",
         rationale: "High volatility. Watch geopolitical signals. Set price alert at $15,500 to trigger buy.",
     },
 ];
@@ -169,6 +175,29 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export default function DashboardPage() {
     const [sel, setSel] = useState("copper");
     const [tick, setTick] = useState(0);
+    const [recs, setRecs] = useState<Recommendation[]>(RECS);
+    const [editingId, setEditingId] = useState<string | null>(null);
+
+    const calculateAdjustedPrice = (base: number, qty: number) => {
+        // Bulk discount: 1% for every 200 units above 100, max 10%
+        const discountFactor = Math.min(0.1, Math.max(0, Math.floor((qty - 100) / 200) * 0.01));
+        return Math.round(base * (1 - discountFactor));
+    };
+
+    const getUrgency = (qty: number): "high" | "medium" | "low" => {
+        if (qty >= 100 && qty <= 1000) return "high"; // Target range
+        if (qty > 1000) return "medium";
+        return "low";
+    };
+
+    const handleUpdateQty = (id: string, newQty: number) => {
+        setRecs(prev => prev.map(r => {
+            if (r.id !== id) return r;
+            const urgency = getUrgency(newQty);
+            const currentPrice = calculateAdjustedPrice(r.basePrice, newQty);
+            return { ...r, qty: newQty, urgency, currentPrice };
+        }));
+    };
 
     useEffect(() => {
         const t = setInterval(() => setTick(x => x + 1), 3000);
@@ -176,8 +205,11 @@ export default function DashboardPage() {
     }, []);
 
     const metal = METALS.find(m => m.id === sel) as Metal;
+    const currentRec = recs.find(r => r.symbol === metal.symbol);
+    const effectivePrice = currentRec ? currentRec.currentPrice : metal.price;
+
     const chartData = CHART_DATA[sel];
-    const diff = metal.price - metal.prev;
+    const diff = effectivePrice - metal.prev;
     const up = diff >= 0;
 
     const urgencyStyle: Record<string, { bg: string; border: string; color: string; label: string }> = {
@@ -234,7 +266,9 @@ export default function DashboardPage() {
                                         {u ? "▲" : "▼"} {Math.abs(p).toFixed(2)}%
                                     </span>
                                 </div>
-                                <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 20, fontWeight: 700, color: "#f1f5f9" }}>${fmt(m.price)}</div>
+                                <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 20, fontWeight: 700, color: "#f1f5f9" }}>
+                                    ${fmt(recs.find(r => r.symbol === m.symbol)?.currentPrice || m.price)}
+                                </div>
                                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
                                     <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 9, color: "#334155" }}>LME: ${fmt(m.src1)}</span>
                                     <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 9, color: "#334155" }}>Kitco: ${fmt(m.src2)}</span>
@@ -319,7 +353,7 @@ export default function DashboardPage() {
                             </div>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                                 {[
-                                    { l: "Current Price", v: `$${fmt(metal.price)}`, c: null },
+                                    { l: "Current Price", v: `$${fmt(effectivePrice)}`, c: null },
                                     { l: "Day Change", v: `${diff >= 0 ? "+" : ""}$${fmt(Math.abs(diff))}`, c: up ? "#34d399" : "#f87171" },
                                     { l: "3M Forecast", v: `$${fmt(chartData[9]?.forecast)}`, c: null },
                                     { l: "6M Forecast", v: `$${fmt(chartData[11]?.forecast)}`, c: null },
@@ -372,17 +406,19 @@ export default function DashboardPage() {
                         <span style={{ marginLeft: "auto", fontSize: 10, color: "#334155", fontFamily: "JetBrains Mono, monospace", fontWeight: 400, letterSpacing: 0 }}>Based on price forecast + PCL requirements</span>
                     </div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
-                        {RECS.map(r => {
+                        {recs.map(r => {
                             const us = urgencyStyle[r.urgency];
+                            const isEditing = editingId === r.id;
+
                             return (
-                                <div key={r.metal} className="rec-card" style={{ background: "#0d1829", border: `1px solid ${r.urgency === "high" ? "rgba(239,68,68,.25)" : "#1a2a3a"}`, borderRadius: 12, padding: 18, transition: "border-color .2s" }}>
+                                <div key={r.id} className="rec-card" style={{ background: "#0d1829", border: `1px solid ${r.urgency === "high" ? "rgba(239,68,68,.25)" : "#1a2a3a"}`, borderRadius: 12, padding: 18, transition: "border-color .2s" }}>
 
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
                                         <div>
                                             <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, fontWeight: 700, letterSpacing: 2, color: "#475569" }}>{r.symbol}</div>
                                             <div style={{ fontSize: 24, fontWeight: 800, color: r.color }}>{r.metal}</div>
                                         </div>
-                                        <span style={{ fontSize: 11, fontWeight: 700, fontFamily: "JetBrains Mono, monospace", letterSpacing: 1, padding: "4px 10px", borderRadius: 4, background: us.bg, border: `1px solid ${us.border}`, color: us.color }}>
+                                        <span style={{ fontSize: 11, fontWeight: 700, fontFamily: "JetBrains Mono, monospace", letterSpacing: 1, padding: "4px 10px", borderRadius: 4, background: us.bg, border: `1px solid ${us.border}`, color: us.color, minWidth: 80, textAlign: "center" }}>
                                             {us.label}
                                         </span>
                                     </div>
@@ -392,11 +428,46 @@ export default function DashboardPage() {
                                             { l: "Current Price", v: `$${fmt(r.currentPrice)}`, c: null as string | null },
                                             { l: "6M Forecast", v: `$${fmt(r.projectedPrice)}`, c: r.priceRisk.startsWith("+") ? "#f87171" : "#34d399" },
                                             { l: "Price Risk", v: r.priceRisk, c: r.priceRisk.startsWith("+") ? "#fbbf24" : "#34d399" },
-                                            { l: "Qty Needed", v: r.qty, c: null as string | null },
+                                            { l: "Qty Needed", v: r.qty, c: null as string | null, editable: true },
                                         ].map(s => (
                                             <div key={s.l} className="stat-block">
-                                                <div style={{ fontSize: 9, color: "#334155", letterSpacing: 1.5, fontFamily: "JetBrains Mono, monospace", textTransform: "uppercase", fontWeight: 700, marginBottom: 3 }}>{s.l}</div>
-                                                <div style={{ fontSize: 13, fontWeight: 700, fontFamily: "JetBrains Mono, monospace", color: s.c || "#e2e8f0" }}>{s.v}</div>
+                                                <div style={{ fontSize: 9, color: "#334155", letterSpacing: 1.5, fontFamily: "JetBrains Mono, monospace", textTransform: "uppercase", fontWeight: 700, marginBottom: 3, display: "flex", justifyContent: "space-between" }}>
+                                                    {s.l}
+                                                    {s.editable && !isEditing && (
+                                                        <Edit2
+                                                            className="w-2.5 h-2.5 cursor-pointer hover:text-blue-400"
+                                                            onClick={() => setEditingId(r.id)}
+                                                        />
+                                                    )}
+                                                    {s.editable && isEditing && (
+                                                        <Check
+                                                            className="w-2.5 h-2.5 cursor-pointer text-green-400 hover:text-green-300"
+                                                            onClick={() => setEditingId(null)}
+                                                        />
+                                                    )}
+                                                </div>
+                                                <div style={{ fontSize: 13, fontWeight: 700, fontFamily: "JetBrains Mono, monospace", color: s.c || "#e2e8f0" }}>
+                                                    {s.editable && isEditing ? (
+                                                        <input
+                                                            type="number"
+                                                            value={r.qty}
+                                                            onChange={(e) => handleUpdateQty(r.id, parseInt(e.target.value) || 0)}
+                                                            autoFocus
+                                                            style={{
+                                                                background: "transparent",
+                                                                border: "none",
+                                                                borderBottom: "1px solid #1e3a5f",
+                                                                color: "#e2e8f0",
+                                                                width: "100%",
+                                                                fontSize: 13,
+                                                                outline: "none",
+                                                                fontFamily: "inherit"
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        s.editable ? `${fmt(r.qty)} MT` : s.v
+                                                    )}
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
