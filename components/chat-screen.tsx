@@ -307,7 +307,7 @@ export function ChatScreen({ className }: { className?: string }) {
                         className="flex h-9 w-9 min-h-[36px] min-w-[36px] items-center justify-center sm:h-9 sm:w-9"
                         aria-label="Sending"
                       >
-                        <div className="h-4 w-4 animate-spin bg-[#e82baf] rounded-sm" />
+                        <div className="h-4 w-4 animate-spin rounded-sm bg-primary" />
                       </motion.div>
                     ) : input.trim() ? (
                       <motion.div
@@ -327,9 +327,9 @@ export function ChatScreen({ className }: { className?: string }) {
                           }}
                           disabled={isSending}
                           aria-label="Send message"
-                          className="h-9 w-9 min-h-[36px] min-w-[36px] rounded-full bg-primary shadow-md sm:h-9 sm:w-9 [&_svg]:text-[#e82baf]!"
+                          className="h-9 w-9 min-h-[36px] min-w-[36px] rounded-full bg-primary text-primary-foreground shadow-md sm:h-9 sm:w-9"
                         >
-                          <Send className="h-4 w-4 text-[#e82baf]" />
+                          <Send className="h-4 w-4" />
                         </Button>
                       </motion.div>
                     ) : (
@@ -337,9 +337,9 @@ export function ChatScreen({ className }: { className?: string }) {
                         key="inactive"
                         initial={{ opacity: 0.5 }}
                         animate={{ opacity: 1 }}
-                        className="flex h-9 w-9 min-h-[36px] min-w-[36px] items-center justify-center rounded-full bg-muted/50 pointer-events-none sm:h-9 sm:w-9"
+                        className="pointer-events-none flex h-9 w-9 min-h-[36px] min-w-[36px] items-center justify-center rounded-full bg-muted/60 sm:h-9 sm:w-9"
                       >
-                        <Send className="h-4 w-4 text-[#e82baf]" />
+                        <Send className="h-4 w-4 text-muted-foreground" />
                       </motion.div>
                     )}
                   </AnimatePresence>

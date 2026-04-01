@@ -10,7 +10,7 @@ export function FloatingAgentButton() {
         <button
             onClick={() => setIsAgentOpen(!isAgentOpen)}
             title={isAgentOpen ? "Close AI Agent" : "Open AI Agent"}
-            className="fixed bottom-6 right-6 z-[110] flex items-center justify-center p-4 rounded-full bg-linear-to-tr from-blue-500 to-emerald-500 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 group cursor-pointer"
+            className="fixed bottom-6 right-6 z-110 group flex cursor-pointer items-center justify-center rounded-full border border-border/80 bg-linear-to-tr from-primary to-[#8f9fff] p-4 text-primary-foreground shadow-xl shadow-blue-950/35 transition-all duration-300 hover:scale-105 hover:shadow-2xl"
         >
             <div className="relative w-6 h-6">
                 {/* Bot icon — visible when chat is closed */}
@@ -25,7 +25,7 @@ export function FloatingAgentButton() {
                 />
             </div>
             {!isAgentOpen && (
-                <Sparkles className="w-3 h-3 absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-yellow-300" />
+                <Sparkles className="absolute top-3 right-3 h-3 w-3 text-[--warning] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
             )}
         </button>
     );

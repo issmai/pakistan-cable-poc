@@ -15,7 +15,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       size="icon"
       onClick={toggleTheme}
       aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-      className={cn(className)}
+      className={cn("border border-border/80 bg-card/70 hover:bg-accent", className)}
     >
       <motion.div
         initial={false}

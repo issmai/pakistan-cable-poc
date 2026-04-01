@@ -1,28 +1,133 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0f1726;
+  --foreground: #e6edf7;
+  --card: #182235;
+  --card-foreground: #e6edf7;
+  --popover: #182235;
+  --popover-foreground: #e6edf7;
+  --primary: #76a8ff;
+  --primary-foreground: #0c1523;
+  --secondary: #222f45;
+  --secondary-foreground: #c6d2e5;
+  --muted: #202c41;
+  --muted-foreground: #93a4bf;
+  --accent: #2a3850;
+  --accent-foreground: #e1ebff;
+  --destructive: #f06f7a;
+  --input: #27354d;
+  --border: #32435f;
+  --ring: #8eb4ff;
+  --radius: 0.85rem;
+  --success: #72d0a4;
+  --warning: #f2c27b;
+  --surface-2: #131d2e;
+  --surface-3: #1d2940;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --font-sans: var(--font-plus-jakarta), var(--font-geist-sans), sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), var(--font-geist-mono), monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  color-scheme: dark;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+* {
+  border-color: var(--border);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--foreground);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+p,
+span,
+label {
+  color: inherit;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+th {
+  background: var(--surface-2);
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.7rem 0.9rem;
+}
+
+td {
+  padding: 0.75rem 0.9rem;
+  color: var(--card-foreground);
+  border-top: 1px solid var(--border);
+}
+
+.app-shell {
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgb(118 168 255 / 16%), transparent 60%),
+    radial-gradient(1000px 500px at 10% -15%, rgb(159 123 255 / 12%), transparent 62%),
+    var(--background);
+}
+
+.panel {
+  background: rgb(24 34 53 / 88%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 34px rgb(4 8 18 / 32%);
 }
 
 /* ─── Chat scrollbar ─── */

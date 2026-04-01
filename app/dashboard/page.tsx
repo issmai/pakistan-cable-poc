@@ -162,10 +162,10 @@ const fmt = (n: number | null | undefined): string => n?.toLocaleString("en-US")
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload?.length) return null;
     return (
-        <div style={{ background: "#0f172a", border: "1px solid #1e3a5f", borderRadius: 8, padding: "10px 14px", fontSize: 12, fontFamily: "JetBrains Mono, monospace", color: "#94a3b8" }}>
-            <div style={{ color: "#e2e8f0", fontWeight: 700, marginBottom: 6 }}>{label}</div>
+        <div style={{ background: "#131d2e", border: "1px solid #32435f", borderRadius: 8, padding: "10px 14px", fontSize: 12, fontFamily: "IBM Plex Mono, monospace", color: "#b9c7de" }}>
+            <div style={{ color: "#e6edf7", fontWeight: 700, marginBottom: 6 }}>{label}</div>
             {payload.map((p: any) => p.value != null && (
-                <div key={p.name} style={{ color: p.color, marginBottom: 2 }}>{p.name}: <strong style={{ color: "#e2e8f0" }}>{typeof p.value === "number" && p.value > 100 ? "$" : ""}{fmt(p.value as number)}{typeof p.value === "number" && p.value < 100 ? " MT" : ""}</strong></div>
+                <div key={p.name} style={{ color: p.color, marginBottom: 2 }}>{p.name}: <strong style={{ color: "#e6edf7" }}>{typeof p.value === "number" && p.value > 100 ? "$" : ""}{fmt(p.value as number)}{typeof p.value === "number" && p.value < 100 ? " MT" : ""}</strong></div>
             ))}
         </div>
     );
@@ -213,28 +213,27 @@ export default function DashboardPage() {
     const up = diff >= 0;
 
     const urgencyStyle: Record<string, { bg: string; border: string; color: string; label: string }> = {
-        high: { bg: "rgba(239,68,68,.15)", border: "rgba(239,68,68,.4)", color: "#f87171", label: "● BUY NOW" },
-        medium: { bg: "rgba(251,191,36,.12)", border: "rgba(251,191,36,.35)", color: "#fbbf24", label: "◉ MONITOR" },
-        low: { bg: "rgba(56,189,248,.12)", border: "rgba(56,189,248,.35)", color: "#38bdf8", label: "○ WAIT" },
+        high: { bg: "rgba(255,143,159,.15)", border: "rgba(255,143,159,.38)", color: "#ff8f9f", label: "● BUY NOW" },
+        medium: { bg: "rgba(255,208,137,.14)", border: "rgba(255,208,137,.34)", color: "#ffd089", label: "◉ MONITOR" },
+        low: { bg: "rgba(123,216,255,.12)", border: "rgba(123,216,255,.34)", color: "#7bd8ff", label: "○ WAIT" },
     };
 
     return (
         <>
             <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap%27);
         *{box-sizing:border-box;margin:0;padding:0}
-        ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:2px}
-        body{background:#070d1a}
+        ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#131d2e}::-webkit-scrollbar-thumb{background:#32435f;border-radius:2px}
+        body{background:#0f1726}
         @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.5)}}
         @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
         .fade{animation:fadeUp .4s ease both}
         .fade1{animation-delay:.05s}.fade2{animation-delay:.12s}.fade3{animation-delay:.2s}.fade4{animation-delay:.28s}
-        .ticker:hover,.ticker.on{border-color:#f0a500!important;background:#0f1e30!important;box-shadow:0 0 18px rgba(240,165,0,.15)!important}
-        .rec-card:hover{border-color:#2a3a50!important}
-        .stat-block{background:#0a1120;border-radius:6px;padding:10px 12px}
+        .ticker:hover,.ticker.on{border-color:#8eb4ff!important;background:#1c2940!important;box-shadow:0 0 18px rgba(142,180,255,.2)!important}
+        .rec-card:hover{border-color:#49617f!important}
+        .stat-block{background:#131d2e;border-radius:8px;padding:10px 12px}
       `}</style>
 
-            <div style={{ background: "#070d1a", minHeight: "100vh", padding: 24, fontFamily: "Syne, sans-serif", color: "#e2e8f0" }}>
+            <div style={{ background: "#0f1726", minHeight: "100vh", padding: 24, fontFamily: "Plus Jakarta Sans, sans-serif", color: "#e6edf7" }}>
 
                 {/* HEADER */}
                 <div className="fade fade1" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
@@ -255,23 +254,23 @@ export default function DashboardPage() {
                                 key={m.id}
                                 className={`ticker ${sel === m.id ? "on" : ""}`}
                                 onClick={() => setSel(m.id)}
-                                style={{ flex: "1 1 170px", minWidth: 170, background: "#0d1829", border: "1px solid #1a2a3a", borderRadius: 10, padding: "14px 16px", cursor: "pointer", transition: "all .2s" }}
+                                style={{ flex: "1 1 170px", minWidth: 170, background: "#182235", border: "1px solid #32435f", borderRadius: 10, padding: "14px 16px", cursor: "pointer", transition: "all .2s" }}
                             >
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                                     <div>
-                                        <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, fontWeight: 700, letterSpacing: 2, color: "#475569" }}>{m.symbol}</div>
-                                        <div style={{ fontSize: 13, fontWeight: 600, color: "#94a3b8", margin: "2px 0" }}>{m.label}</div>
+                                        <div style={{ fontFamily: "IBM Plex Mono, monospace", fontSize: 10, fontWeight: 700, letterSpacing: 2, color: "#8ca0bf" }}>{m.symbol}</div>
+                                        <div style={{ fontSize: 13, fontWeight: 600, color: "#b9c7de", margin: "2px 0" }}>{m.label}</div>
                                     </div>
-                                    <span style={{ fontSize: 10, fontWeight: 700, fontFamily: "JetBrains Mono, monospace", color: u ? "#34d399" : "#f87171", background: u ? "rgba(52,211,153,.1)" : "rgba(248,113,113,.1)", border: `1px solid ${u ? "rgba(52,211,153,.2)" : "rgba(248,113,113,.2)"}`, borderRadius: 4, padding: "2px 6px" }}>
+                                    <span style={{ fontSize: 10, fontWeight: 700, fontFamily: "IBM Plex Mono, monospace", color: u ? "#72d0a4" : "#ff8f9f", background: u ? "rgba(114,208,164,.1)" : "rgba(255,143,159,.1)", border: `1px solid ${u ? "rgba(114,208,164,.22)" : "rgba(255,143,159,.24)"}`, borderRadius: 4, padding: "2px 6px" }}>
                                         {u ? "▲" : "▼"} {Math.abs(p).toFixed(2)}%
                                     </span>
                                 </div>
-                                <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 20, fontWeight: 700, color: "#f1f5f9" }}>
+                                <div style={{ fontFamily: "IBM Plex Mono, monospace", fontSize: 20, fontWeight: 700, color: "#f1f6ff" }}>
                                     ${fmt(recs.find(r => r.symbol === m.symbol)?.currentPrice || m.price)}
                                 </div>
                                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-                                    <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 9, color: "#334155" }}>LME: ${fmt(m.src1)}</span>
-                                    <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 9, color: "#334155" }}>Kitco: ${fmt(m.src2)}</span>
+                                    <span style={{ fontFamily: "IBM Plex Mono, monospace", fontSize: 9, color: "#5f7394" }}>LME: ${fmt(m.src1)}</span>
+                                    <span style={{ fontFamily: "IBM Plex Mono, monospace", fontSize: 9, color: "#5f7394" }}>Kitco: ${fmt(m.src2)}</span>
                                 </div>
                             </div>
                         );
@@ -282,87 +281,89 @@ export default function DashboardPage() {
                 <div className="fade fade2" style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 14, marginBottom: 14 }}>
 
                     {/* Price Chart */}
-                    <div style={{ background: "#0d1829", border: "1px solid #1a2a3a", borderRadius: 12, padding: 20 }}>
+                    <div style={{ background: "#182235", border: "1px solid #32435f", borderRadius: 12, padding: 20, display: "flex", flexDirection: "column", minHeight: 0 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "#475569", display: "flex", alignItems: "center", gap: 8 }}>
-                                <span style={{ color: "#f0a500" }}>◆</span> {metal.label} · Price Trend &amp; 6-Month Forecast
+                            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "#8ca0bf", display: "flex", alignItems: "center", gap: 8 }}>
+                                <span style={{ color: "#8eb4ff" }}>◆</span> {metal.label} · Price Trend &amp; 6-Month Forecast
                             </div>
                             <div style={{ display: "flex", gap: 14 }}>
-                                {([["#f0a500", "Actual", false], ["#38bdf8", "Forecast", true]] as const).map(([c, l, dashed]) => (
-                                    <span key={l} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10, color: "#475569", fontFamily: "JetBrains Mono, monospace" }}>
+                                {([["#8eb4ff", "Actual", false], ["#7bd8ff", "Forecast", true]] as const).map(([c, l, dashed]) => (
+                                    <span key={l} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10, color: "#8ca0bf", fontFamily: "IBM Plex Mono, monospace" }}>
                                         <div style={{ width: 18, height: 2, background: dashed ? "transparent" : c, borderTop: dashed ? `2px dashed ${c}` : "none" }} />
                                         {l}
                                     </span>
                                 ))}
                             </div>
                         </div>
-                        <ResponsiveContainer width="100%" height={230}>
-                            <ComposedChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-                                <defs>
-                                    <linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#f0a500" stopOpacity={0.25} />
-                                        <stop offset="95%" stopColor="#f0a500" stopOpacity={0} />
-                                    </linearGradient>
-                                    <linearGradient id="gBlue" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.15} />
-                                        <stop offset="95%" stopColor="#38bdf8" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#1a2a3a" />
-                                <XAxis dataKey="month" tick={{ fill: "#475569", fontSize: 10, fontFamily: "JetBrains Mono" }} tickLine={false} axisLine={false} />
-                                <YAxis tick={{ fill: "#475569", fontSize: 10, fontFamily: "JetBrains Mono" }} tickLine={false} axisLine={false} tickFormatter={v => `$${(v / 1000).toFixed(v > 5000 ? 0 : 1)}k`} />
-                                <Tooltip content={<CustomTooltip />} />
-                                <ReferenceLine x="Feb '25" stroke="#334155" strokeDasharray="4 4" label={{ value: "TODAY", position: "top", fill: "#334155", fontSize: 9, fontFamily: "JetBrains Mono" }} />
-                                <Area type="monotone" dataKey="high" stroke="none" fill="url(#gBlue)" name="Upper Band" connectNulls />
-                                <Area type="monotone" dataKey="low" stroke="none" fill="#070d1a" name="Lower Band" connectNulls />
-                                <Area type="monotone" dataKey="price" stroke="#f0a500" strokeWidth={2.5} fill="url(#gGold)" dot={false} name="Actual Price" connectNulls />
-                                <Line type="monotone" dataKey="forecast" stroke="#38bdf8" strokeWidth={2} strokeDasharray="6 3" dot={false} name="Forecast Price" connectNulls />
-                            </ComposedChart>
-                        </ResponsiveContainer>
+                        <div style={{ flex: 1, minHeight: 280 }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <ComposedChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+                                    <defs>
+                                        <linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#8eb4ff" stopOpacity={0.25} />
+                                            <stop offset="95%" stopColor="#8eb4ff" stopOpacity={0} />
+                                        </linearGradient>
+                                        <linearGradient id="gBlue" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#7bd8ff" stopOpacity={0.15} />
+                                            <stop offset="95%" stopColor="#7bd8ff" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#32435f" />
+                                    <XAxis dataKey="month" tick={{ fill: "#8ca0bf", fontSize: 10, fontFamily: "IBM Plex Mono" }} tickLine={false} axisLine={false} />
+                                    <YAxis tick={{ fill: "#8ca0bf", fontSize: 10, fontFamily: "IBM Plex Mono" }} tickLine={false} axisLine={false} tickFormatter={v => `$${(v / 1000).toFixed(v > 5000 ? 0 : 1)}k`} />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <ReferenceLine x="Feb '25" stroke="#5f7394" strokeDasharray="4 4" label={{ value: "TODAY", position: "top", fill: "#5f7394", fontSize: 9, fontFamily: "IBM Plex Mono" }} />
+                                    <Area type="monotone" dataKey="high" stroke="none" fill="url(#gBlue)" name="Upper Band" connectNulls />
+                                    <Area type="monotone" dataKey="low" stroke="none" fill="#0f1726" name="Lower Band" connectNulls />
+                                    <Area type="monotone" dataKey="price" stroke="#8eb4ff" strokeWidth={2.5} fill="url(#gGold)" dot={false} name="Actual Price" connectNulls />
+                                    <Line type="monotone" dataKey="forecast" stroke="#7bd8ff" strokeWidth={2} strokeDasharray="6 3" dot={false} name="Forecast Price" connectNulls />
+                                </ComposedChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
 
                     {/* Right: Source + Stats */}
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 
                         {/* Source Compare */}
-                        <div style={{ background: "#0d1829", border: "1px solid #1a2a3a", borderRadius: 12, padding: 18 }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "#475569", marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
-                                <span style={{ color: "#f0a500" }}>◆</span> Source Comparison · {metal.label}
+                        <div style={{ background: "#182235", border: "1px solid #32435f", borderRadius: 12, padding: 18 }}>
+                            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "#8ca0bf", marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
+                                <span style={{ color: "#8eb4ff" }}>◆</span> Source Comparison · {metal.label}
                             </div>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                                 {([["LME.com", metal.src1], ["Kitco", metal.src2]] as [string, number][]).map(([name, price]) => (
-                                    <div key={name} style={{ background: "#0a1120", borderRadius: 8, padding: 12, textAlign: "center" }}>
-                                        <div style={{ fontSize: 9, letterSpacing: 2, textTransform: "uppercase", color: "#334155", fontWeight: 700, marginBottom: 6, fontFamily: "JetBrains Mono, monospace" }}>{name}</div>
-                                        <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 18, fontWeight: 700, color: "#e2e8f0" }}>${fmt(price as number)}</div>
-                                        <div style={{ fontSize: 10, color: "#475569", marginTop: 3, fontFamily: "JetBrains Mono, monospace" }}>{metal.unit}</div>
+                                    <div key={name} style={{ background: "#131d2e", borderRadius: 8, padding: 12, textAlign: "center" }}>
+                                        <div style={{ fontSize: 9, letterSpacing: 2, textTransform: "uppercase", color: "#5f7394", fontWeight: 700, marginBottom: 6, fontFamily: "IBM Plex Mono, monospace" }}>{name}</div>
+                                        <div style={{ fontFamily: "IBM Plex Mono, monospace", fontSize: 18, fontWeight: 700, color: "#e6edf7" }}>${fmt(price as number)}</div>
+                                        <div style={{ fontSize: 10, color: "#8ca0bf", marginTop: 3, fontFamily: "IBM Plex Mono, monospace" }}>{metal.unit}</div>
                                     </div>
                                 ))}
                             </div>
-                            <div style={{ marginTop: 10, padding: "10px 14px", background: "#0a1120", borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                <span style={{ fontSize: 11, color: "#475569", fontFamily: "JetBrains Mono, monospace" }}>Spread</span>
-                                <span style={{ fontSize: 13, fontWeight: 700, fontFamily: "JetBrains Mono, monospace", color: Math.abs(metal.src1 - metal.src2) < 15 ? "#34d399" : "#fbbf24" }}>
+                            <div style={{ marginTop: 10, padding: "10px 14px", background: "#131d2e", borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                <span style={{ fontSize: 11, color: "#8ca0bf", fontFamily: "IBM Plex Mono, monospace" }}>Spread</span>
+                                <span style={{ fontSize: 13, fontWeight: 700, fontFamily: "IBM Plex Mono, monospace", color: Math.abs(metal.src1 - metal.src2) < 15 ? "#72d0a4" : "#ffd089" }}>
                                     ${Math.abs(metal.src1 - metal.src2)} {Math.abs(metal.src1 - metal.src2) < 15 ? "✓ Tight" : "⚠ Wide"}
                                 </span>
                             </div>
                         </div>
 
                         {/* Price Stats */}
-                        <div style={{ background: "#0d1829", border: "1px solid #1a2a3a", borderRadius: 12, padding: 18, flex: 1 }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "#475569", marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
-                                <span style={{ color: "#f0a500" }}>◆</span> Price Statistics
+                        <div style={{ background: "#182235", border: "1px solid #32435f", borderRadius: 12, padding: 18, flex: 1 }}>
+                            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "#8ca0bf", marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
+                                <span style={{ color: "#8eb4ff" }}>◆</span> Price Statistics
                             </div>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                                 {[
                                     { l: "Current Price", v: `$${fmt(effectivePrice)}`, c: null },
-                                    { l: "Day Change", v: `${diff >= 0 ? "+" : ""}$${fmt(Math.abs(diff))}`, c: up ? "#34d399" : "#f87171" },
+                                    { l: "Day Change", v: `${diff >= 0 ? "+" : ""}$${fmt(Math.abs(diff))}`, c: up ? "#72d0a4" : "#ff8f9f" },
                                     { l: "3M Forecast", v: `$${fmt(chartData[9]?.forecast)}`, c: null },
                                     { l: "6M Forecast", v: `$${fmt(chartData[11]?.forecast)}`, c: null },
-                                    { l: "6M High", v: `$${fmt(chartData[11]?.high)}`, c: "#f87171" },
-                                    { l: "6M Low", v: `$${fmt(chartData[9]?.low)}`, c: "#34d399" },
+                                    { l: "6M High", v: `$${fmt(chartData[11]?.high)}`, c: "#ff8f9f" },
+                                    { l: "6M Low", v: `$${fmt(chartData[9]?.low)}`, c: "#72d0a4" },
                                 ].map(s => (
                                     <div key={s.l} className="stat-block">
-                                        <div style={{ fontSize: 9, color: "#334155", letterSpacing: 1.5, fontFamily: "JetBrains Mono, monospace", textTransform: "uppercase", fontWeight: 700, marginBottom: 4 }}>{s.l}</div>
-                                        <div style={{ fontSize: 14, fontWeight: 700, fontFamily: "JetBrains Mono, monospace", color: s.c || "#e2e8f0" }}>{s.v}</div>
+                                        <div style={{ fontSize: 9, color: "#5f7394", letterSpacing: 1.5, fontFamily: "IBM Plex Mono, monospace", textTransform: "uppercase", fontWeight: 700, marginBottom: 4 }}>{s.l}</div>
+                                        <div style={{ fontSize: 14, fontWeight: 700, fontFamily: "IBM Plex Mono, monospace", color: s.c || "#e6edf7" }}>{s.v}</div>
                                     </div>
                                 ))}
                             </div>
@@ -372,14 +373,14 @@ export default function DashboardPage() {
                 </div>
 
                 {/* ROW 2: Procurement */}
-                <div className="fade fade3" style={{ background: "#0d1829", border: "1px solid #1a2a3a", borderRadius: 12, padding: 20, marginBottom: 14 }}>
+                <div className="fade fade3" style={{ background: "#182235", border: "1px solid #32435f", borderRadius: 12, padding: 20, marginBottom: 14 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "#475569", display: "flex", alignItems: "center", gap: 8 }}>
-                            <span style={{ color: "#f0a500" }}>◆</span> PCL Procurement Trend · Actuals vs Requirement vs Recommended Order
+                        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "#8ca0bf", display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{ color: "#8eb4ff" }}>◆</span> PCL Procurement Trend · Actuals vs Requirement vs Recommended Order
                         </div>
                         <div style={{ display: "flex", gap: 14 }}>
-                            {[["#f0a500", "Actual"], ["#34d399", "Recommended"], ["#64748b", "Required"]].map(([c, l]) => (
-                                <span key={l} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10, color: "#475569", fontFamily: "JetBrains Mono, monospace" }}>
+                            {[["#8eb4ff", "Actual"], ["#72d0a4", "Recommended"], ["#93a4bf", "Required"]].map(([c, l]) => (
+                                <span key={l} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10, color: "#8ca0bf", fontFamily: "IBM Plex Mono, monospace" }}>
                                     <div style={{ width: 10, height: 10, borderRadius: 2, background: c, opacity: .8 }} /> {l}
                                 </span>
                             ))}
@@ -387,23 +388,23 @@ export default function DashboardPage() {
                     </div>
                     <ResponsiveContainer width="100%" height={200}>
                         <ComposedChart data={PROCUREMENT} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#1a2a3a" />
-                            <XAxis dataKey="month" tick={{ fill: "#475569", fontSize: 10, fontFamily: "JetBrains Mono" }} tickLine={false} axisLine={false} />
-                            <YAxis tick={{ fill: "#475569", fontSize: 10, fontFamily: "JetBrains Mono" }} tickLine={false} axisLine={false} unit=" MT" />
+                            <CartesianGrid strokeDasharray="3 3" stroke="#32435f" />
+                            <XAxis dataKey="month" tick={{ fill: "#8ca0bf", fontSize: 10, fontFamily: "IBM Plex Mono" }} tickLine={false} axisLine={false} />
+                            <YAxis tick={{ fill: "#8ca0bf", fontSize: 10, fontFamily: "IBM Plex Mono" }} tickLine={false} axisLine={false} unit=" MT" />
                             <Tooltip content={<CustomTooltip />} />
-                            <ReferenceLine x="Feb '25" stroke="#334155" strokeDasharray="4 4" label={{ value: "TODAY", position: "top", fill: "#334155", fontSize: 9, fontFamily: "JetBrains Mono" }} />
-                            <Bar dataKey="actual" fill="#f0a500" fillOpacity={0.75} radius={[3, 3, 0, 0]} name="Actual (MT)" />
-                            <Bar dataKey="recommended" fill="#34d399" fillOpacity={0.65} radius={[3, 3, 0, 0]} name="Recommended (MT)" />
-                            <Line type="monotone" dataKey="required" stroke="#64748b" strokeWidth={2} strokeDasharray="5 3" dot={false} name="Required (MT)" connectNulls />
+                            <ReferenceLine x="Feb '25" stroke="#5f7394" strokeDasharray="4 4" label={{ value: "TODAY", position: "top", fill: "#5f7394", fontSize: 9, fontFamily: "IBM Plex Mono" }} />
+                            <Bar dataKey="actual" fill="#8eb4ff" fillOpacity={0.75} radius={[3, 3, 0, 0]} name="Actual (MT)" />
+                            <Bar dataKey="recommended" fill="#72d0a4" fillOpacity={0.65} radius={[3, 3, 0, 0]} name="Recommended (MT)" />
+                            <Line type="monotone" dataKey="required" stroke="#93a4bf" strokeWidth={2} strokeDasharray="5 3" dot={false} name="Required (MT)" connectNulls />
                         </ComposedChart>
                     </ResponsiveContainer>
                 </div>
 
                 {/* ROW 3: Recommendations */}
                 <div className="fade fade4">
-                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "#475569", marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ color: "#f0a500" }}>◆</span> AI Order Timing Recommendations
-                        <span style={{ marginLeft: "auto", fontSize: 10, color: "#334155", fontFamily: "JetBrains Mono, monospace", fontWeight: 400, letterSpacing: 0 }}>Based on price forecast + PCL requirements</span>
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "#8ca0bf", marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ color: "#8eb4ff" }}>◆</span> AI Order Timing Recommendations
+                        <span style={{ marginLeft: "auto", fontSize: 10, color: "#5f7394", fontFamily: "IBM Plex Mono, monospace", fontWeight: 400, letterSpacing: 0 }}>Based on price forecast + PCL requirements</span>
                     </div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
                         {recs.map(r => {
@@ -411,11 +412,11 @@ export default function DashboardPage() {
                             const isEditing = editingId === r.id;
 
                             return (
-                                <div key={r.id} className="rec-card" style={{ background: "#0d1829", border: `1px solid ${r.urgency === "high" ? "rgba(239,68,68,.25)" : "#1a2a3a"}`, borderRadius: 12, padding: 18, transition: "border-color .2s" }}>
+                                <div key={r.id} className="rec-card" style={{ background: "#182235", border: `1px solid ${r.urgency === "high" ? "rgba(255,143,159,.26)" : "#32435f"}`, borderRadius: 12, padding: 18, transition: "border-color .2s" }}>
 
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
                                         <div>
-                                            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, fontWeight: 700, letterSpacing: 2, color: "#475569" }}>{r.symbol}</div>
+                                            <div style={{ fontFamily: "IBM Plex Mono, monospace", fontSize: 10, fontWeight: 700, letterSpacing: 2, color: "#8ca0bf" }}>{r.symbol}</div>
                                             <div style={{ fontSize: 24, fontWeight: 800, color: r.color }}>{r.metal}</div>
                                         </div>
                                         <span style={{ fontSize: 11, fontWeight: 700, fontFamily: "JetBrains Mono, monospace", letterSpacing: 1, padding: "4px 10px", borderRadius: 4, background: us.bg, border: `1px solid ${us.border}`, color: us.color, minWidth: 80, textAlign: "center" }}>
@@ -423,7 +424,7 @@ export default function DashboardPage() {
                                         </span>
                                     </div>
 
-                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7 }}>
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7}}>
                                         {[
                                             { l: "Current Price", v: `$${fmt(r.currentPrice)}`, c: null as string | null },
                                             { l: "6M Forecast", v: `$${fmt(r.projectedPrice)}`, c: r.priceRisk.startsWith("+") ? "#f87171" : "#34d399" },
@@ -431,7 +432,7 @@ export default function DashboardPage() {
                                             { l: "Qty Needed", v: r.qty, c: null as string | null, editable: true },
                                         ].map(s => (
                                             <div key={s.l} className="stat-block">
-                                                <div style={{ fontSize: 9, color: "#334155", letterSpacing: 1.5, fontFamily: "JetBrains Mono, monospace", textTransform: "uppercase", fontWeight: 700, marginBottom: 3, display: "flex", justifyContent: "space-between" }}>
+                                                <div style={{ fontSize: 9, color: "#8eb4ff", letterSpacing: 1.5, fontFamily: "JetBrains Mono, monospace", textTransform: "uppercase", fontWeight: 700, marginBottom: 3, display: "flex", justifyContent: "space-between" }}>
                                                     {s.l}
                                                     {s.editable && !isEditing && (
                                                         <Edit2
@@ -472,12 +473,12 @@ export default function DashboardPage() {
                                         ))}
                                     </div>
 
-                                    <p style={{ fontSize: 12, color: "#64748b", lineHeight: 1.6, marginTop: 12 }}>{r.rationale}</p>
+                                    <p style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.6, marginTop: 12 }}>{r.rationale}</p>
 
                                     <div style={{ marginTop: 12 }}>
                                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                                            <span style={{ fontSize: 9, color: "#334155", fontFamily: "JetBrains Mono, monospace", fontWeight: 700, letterSpacing: 1.5 }}>MODEL CONFIDENCE</span>
-                                            <span style={{ fontSize: 10, fontFamily: "JetBrains Mono, monospace", color: "#64748b" }}>{r.confidence}%</span>
+                                            <span style={{ fontSize: 9, color: "#94a3b8", fontFamily: "JetBrains Mono, monospace", fontWeight: 700, letterSpacing: 1.5 }}>MODEL CONFIDENCE</span>
+                                            <span style={{ fontSize: 10, fontFamily: "JetBrains Mono, monospace", color: "#94a3b8" }}>{r.confidence}%</span>
                                         </div>
                                         <div style={{ height: 3, background: "#1a2a3a", borderRadius: 2, overflow: "hidden" }}>
                                             <div style={{ height: "100%", width: `${r.confidence}%`, background: r.color, borderRadius: 2 }} />
@@ -485,7 +486,7 @@ export default function DashboardPage() {
                                     </div>
 
                                     <div style={{ marginTop: 12, padding: "8px 12px", background: "#0a1120", borderRadius: 6, display: "flex", justifyContent: "space-between" }}>
-                                        <span style={{ fontSize: 9, color: "#334155", fontFamily: "JetBrains Mono, monospace", fontWeight: 700, letterSpacing: 1 }}>ORDER WINDOW</span>
+                                        <span style={{ fontSize: 9, color: "#94a3b8", fontFamily: "JetBrains Mono, monospace", fontWeight: 700, letterSpacing: 1 }}>ORDER WINDOW</span>
                                         <span style={{ fontSize: 11, fontFamily: "JetBrains Mono, monospace", color: "#94a3b8", fontWeight: 700 }}>{r.window}</span>
                                     </div>
 

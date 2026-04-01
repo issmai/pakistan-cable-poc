@@ -22,7 +22,7 @@ export default function Sidebar() {
     const pathname = usePathname();
 
     return (
-        <aside className="fixed left-0 top-0 h-screen w-64 bg-zinc-900 text-white shadow-xl flex flex-col border-r border-zinc-800">
+        <aside className="fixed left-0 top-0 flex h-screen w-64 flex-col border-r border-border/80 bg-[rgb(19_29_46/88%)] text-foreground shadow-xl backdrop-blur-xl">
             <div className="p-6">
                 <Image
                     src="/alara-logo.png"
@@ -47,7 +47,7 @@ export default function Sidebar() {
                                 }`}
                         >
                             <item.icon
-                                className={`w-5 h-5 transition-colors ${isActive ? "text-white" : "text-zinc-400 group-hover:text-white"
+                                className={`h-5 w-5 transition-colors ${isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-accent-foreground"
                                     }`}
                             />
                             <span className="font-medium">{item.name}</span>
@@ -56,14 +56,14 @@ export default function Sidebar() {
                 })}
             </nav>
 
-            <div className="p-4 border-t border-zinc-800">
+            <div className="border-t border-border/80 p-4">
                 <div className="flex items-center gap-3 px-2 py-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-xs font-bold">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-tr from-blue-400 to-indigo-500 text-xs font-bold text-primary-foreground">
                         JD
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-sm font-medium text-zinc-200">John Doe</span>
-                        <span className="text-xs text-zinc-500">Free Plan</span>
+                        <span className="text-sm font-medium text-foreground">John Doe</span>
+                        <span className="text-xs text-muted-foreground">Free Plan</span>
                     </div>
                 </div>
             </div>

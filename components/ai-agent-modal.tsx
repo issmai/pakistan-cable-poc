@@ -3,9 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Sparkles, Cable } from "lucide-react";
-import Image from "next/image";
 import { useView } from "@/components/view-context";
-import { useTheme } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
 import ReactMarkdown from "react-markdown";
@@ -28,7 +26,6 @@ const LOADING_MESSAGES = [
 
 export function AiAgentModal() {
     const { isAgentOpen, setIsAgentOpen } = useView();
-    const { theme } = useTheme();
     const [convoID] = useState<string>(() => crypto.randomUUID());
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
@@ -155,29 +152,29 @@ export function AiAgentModal() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 20, scale: 0.95 }}
                     transition={{ type: "spring", damping: 25, stiffness: 350 }}
-                    className="fixed bottom-24 right-6 z-[100] flex flex-col w-[400px] h-[520px] rounded-2xl border border-zinc-700/40 bg-zinc-900 shadow-[0_8px_40px_rgba(0,0,0,0.5)] overflow-hidden"
+                    className="fixed right-6 bottom-24 z-100 flex h-[680px] w-[460px] max-h-[calc(100vh-7rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-[0_18px_55px_rgba(3,8,20,0.65)]"
                 >
                     {/* ── Header with gradient accent line ── */}
                     <div className="relative shrink-0">
                         {/* Top accent gradient bar */}
-                        <div className="h-[2px] w-full bg-linear-to-r from-blue-500 via-emerald-400 to-teal-500" />
-                        <div className="flex items-center justify-between px-4 py-3 bg-zinc-800/80 backdrop-blur-sm">
+                        <div className="h-[2px] w-full bg-linear-to-r from-primary via-[#9fc6ff] to-[#7bd8ff]" />
+                        <div className="flex items-center justify-between bg-surface-2/85 px-4 py-3 sm:px-5 backdrop-blur-sm">
                             <div className="flex items-center gap-3">
                                 {/* Avatar icon */}
-                                <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-linear-to-br from-blue-500/20 to-emerald-500/20 border border-zinc-700/50">
-                                    <Cable className="w-4 h-4 text-emerald-400" />
+                                <div className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-linear-to-br from-primary/20 to-[#7bd8ff]/20">
+                                    <Cable className="h-4 w-4 text-primary" />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-[13px] font-semibold text-zinc-100">Assistant</span>
-                                    <span className="text-[10px] text-emerald-400/80 flex items-center gap-1">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                    <span className="text-sm font-semibold text-foreground">Assistant</span>
+                                    <span className="flex items-center gap-1 text-[10px] text-[--success]">
+                                        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[--success]" />
                                         Online
                                     </span>
                                 </div>
                             </div>
                             <button
                                 onClick={() => setIsAgentOpen(false)}
-                                className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-700/60 transition-all duration-200 cursor-pointer"
+                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-foreground"
                             >
                                 <X className="w-4 h-4" />
                             </button>
@@ -185,23 +182,23 @@ export function AiAgentModal() {
                     </div>
 
                     {/* ── Messages area ── */}
-                    <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-4 space-y-4 chat-scrollable bg-zinc-900/95">
+                    <div className="chat-scrollable flex-1 overflow-y-auto overflow-x-hidden bg-card px-4 py-4 sm:px-5 sm:py-5">
                         {messages.length === 0 && !loading ? (
                             /* Empty state */
-                            <div className="flex flex-col items-center justify-center h-full text-center px-4 gap-4">
-                                <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-blue-500/15 to-emerald-500/15 border border-zinc-700/40 flex items-center justify-center">
-                                    <Sparkles className="w-7 h-7 text-emerald-400/70" />
+                            <div className="flex h-full flex-col items-center justify-center gap-6 px-2 text-center sm:px-4">
+                                <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-linear-to-br from-primary/20 to-[#7bd8ff]/20">
+                                    <Sparkles className="h-8 w-8 text-primary/80" />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-semibold text-zinc-200">
+                                    <p className="text-xl font-semibold text-foreground">
                                         Assistant
                                     </p>
-                                    <p className="text-xs text-zinc-500 mt-2 leading-relaxed max-w-[260px]">
+                                    <p className="mt-2 max-w-[320px] text-sm leading-relaxed text-muted-foreground">
                                         Ask about procurement trends, pricing analysis, inventory forecasts, and more.
                                     </p>
                                 </div>
                                 {/* Suggestion chips */}
-                                <div className="flex flex-wrap gap-1.5 justify-center mt-1">
+                                <div className="mt-4 flex flex-wrap justify-center gap-2.5">
                                     {["Copper price trend", "Order timing", "Inventory forecast"].map((s) => (
                                         <button
                                             key={s}
@@ -209,7 +206,7 @@ export function AiAgentModal() {
                                                 setInput(s);
                                                 inputRef.current?.focus();
                                             }}
-                                            className="px-3 py-1.5 text-[11px] rounded-full border border-zinc-700/50 text-zinc-400 hover:text-emerald-400 hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all duration-200 cursor-pointer"
+                                            className="cursor-pointer rounded-full border border-border px-3.5 py-1.5 text-xs text-muted-foreground transition-all duration-200 hover:border-primary/35 hover:bg-primary/10 hover:text-primary"
                                         >
                                             {s}
                                         </button>
@@ -217,7 +214,7 @@ export function AiAgentModal() {
                                 </div>
                             </div>
                         ) : (
-                            <>
+                            <div className="flex flex-col gap-4">
                                 {messages.map((msg, i) => (
                                     <motion.div
                                         key={msg.id}
@@ -230,16 +227,16 @@ export function AiAgentModal() {
                                         )}
                                     >
                                         {msg.role === "user" ? (
-                                            <div className="max-w-[85%] rounded-2xl rounded-br-sm bg-linear-to-r from-blue-600 to-emerald-600 text-white px-3.5 py-2.5 text-[13px] leading-relaxed shadow-lg shadow-emerald-900/10">
+                                            <div className="max-w-[85%] rounded-2xl rounded-br-sm bg-linear-to-r from-primary to-[#8aa8ff] px-4 py-2 text-[13px] leading-relaxed text-primary-foreground shadow-lg shadow-blue-950/25">
                                                 {msg.content}
                                             </div>
                                         ) : (
-                                            <div className="flex gap-2.5 w-full">
+                                            <div className="flex gap-4 w-full">
                                                 {/* Bot avatar */}
-                                                <div className="shrink-0 w-6 h-6 rounded-md bg-zinc-800 border border-zinc-700/50 flex items-center justify-center mt-0.5">
-                                                    <Cable className="w-3 h-3 text-emerald-400" />
+                                                <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-border bg-surface-2">
+                                                    <Cable className="h-3 w-3 text-primary" />
                                                 </div>
-                                                <div className="flex-1 min-w-0 chat-prose text-zinc-300">
+                                                <div className="chat-prose min-w-0 flex-1 text-card-foreground">
                                                     <ReactMarkdown
                                                         remarkPlugins={[remarkGfm]}
                                                         components={{
@@ -261,10 +258,10 @@ export function AiAgentModal() {
                                     <motion.div
                                         initial={{ opacity: 0, y: 8 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        className="flex gap-2.5"
+                                        className="flex gap-4"
                                     >
-                                        <div className="shrink-0 w-6 h-6 rounded-md bg-zinc-800 border border-zinc-700/50 flex items-center justify-center mt-0.5">
-                                            <Cable className="w-3 h-3 text-emerald-400 animate-pulse" />
+                                        <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-border bg-surface-2">
+                                            <Cable className="h-3 w-3 animate-pulse text-primary" />
                                         </div>
                                         <div className="px-1 py-2 text-[13px]">
                                             <ShimmeringText
@@ -272,21 +269,21 @@ export function AiAgentModal() {
                                                 duration={1.5}
                                                 repeat
                                                 startOnView={false}
-                                                className="text-[13px] text-zinc-400"
+                                                className="text-[13px] text-muted-foreground"
                                             />
                                         </div>
                                     </motion.div>
                                 )}
                                 <div ref={messagesEndRef} />
-                            </>
+                            </div>
                         )}
                     </div>
 
                     {/* ── Input bar ── */}
-                    <div className="shrink-0 px-3 py-3 bg-zinc-900 border-t border-zinc-800/60">
+                    <div className="shrink-0 border-t border-border bg-surface-2 px-3 py-3 sm:px-4 sm:py-4">
                         <form
                             onSubmit={handleSubmit}
-                            className="flex items-center gap-2 bg-zinc-800/60 rounded-xl border border-zinc-700/40 px-3 py-1.5 focus-within:border-emerald-500/30 transition-colors duration-200"
+                            className="flex items-center gap-2 rounded-xl border border-border bg-card px-2.5 py-2 sm:px-3 transition-colors duration-200 focus-within:border-primary/40"
                         >
                             <input
                                 ref={inputRef}
@@ -296,7 +293,7 @@ export function AiAgentModal() {
                                 placeholder="Ask anything..."
                                 disabled={isSending}
                                 className={cn(
-                                    "flex-1 text-[13px] bg-transparent outline-none placeholder:text-zinc-500 text-zinc-200",
+                                    "flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground",
                                     isSending && "opacity-50 pointer-events-none"
                                 )}
                             />
@@ -304,10 +301,10 @@ export function AiAgentModal() {
                                 type="submit"
                                 disabled={!input.trim() || isSending}
                                 className={cn(
-                                    "shrink-0 flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 cursor-pointer",
+                                    "shrink-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg transition-all duration-200",
                                     input.trim() && !isSending
-                                        ? "bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-900/20"
-                                        : "text-zinc-600 cursor-not-allowed"
+                                        ? "bg-primary text-primary-foreground shadow-lg shadow-blue-950/20 hover:bg-primary/90"
+                                        : "cursor-not-allowed text-muted-foreground/50"
                                 )}
                             >
                                 {isSending ? (
