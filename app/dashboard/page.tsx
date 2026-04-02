@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
     Area, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, ReferenceLine, ComposedChart,
 } from "recharts";
-import { Edit2, Check } from "lucide-react";
-import { VendorInfoFeature } from "@/components/vendor-info";
+import { Edit2, Check, TrendingDown, TrendingUp, Award } from "lucide-react";
+import { VendorInfoFeature, type VendorInfo } from "@/components/vendor-info";
 
 /* ─── TYPES ────────────────────────────────────────────────────────────────── */
 
@@ -157,6 +157,65 @@ const RECS: Recommendation[] = [
     },
 ];
 
+/* ─── VENDOR PRICE DATA (hardcoded for POC) ─────────────────────────────────── */
+
+type VendorPriceEntry = {
+    price: number;       // $/MT
+    moq: string;         // Minimum order qty
+    leadTime: string;    // Delivery lead time
+    terms: string;       // Payment terms
+};
+
+// Hardcoded vendor prices keyed by vendor index (order they appear) per metal
+const VENDOR_PRICES: Record<string, VendorPriceEntry[]> = {
+    copper: [
+        { price: 9280, moq: "50 MT", leadTime: "14 days", terms: "LC 60 days" },
+        { price: 9350, moq: "25 MT", leadTime: "7 days", terms: "TT Advance" },
+        { price: 9190, moq: "100 MT", leadTime: "21 days", terms: "LC 90 days" },
+        { price: 9440, moq: "10 MT", leadTime: "5 days", terms: "TT 30 days" },
+        { price: 9310, moq: "75 MT", leadTime: "18 days", terms: "LC 45 days" },
+    ],
+    aluminium: [
+        { price: 2240, moq: "100 MT", leadTime: "10 days", terms: "LC 30 days" },
+        { price: 2310, moq: "50 MT", leadTime: "7 days", terms: "TT Advance" },
+        { price: 2195, moq: "200 MT", leadTime: "28 days", terms: "LC 90 days" },
+        { price: 2275, moq: "25 MT", leadTime: "5 days", terms: "TT 15 days" },
+        { price: 2260, moq: "75 MT", leadTime: "14 days", terms: "LC 60 days" },
+    ],
+    nickel: [
+        { price: 15600, moq: "20 MT", leadTime: "21 days", terms: "LC 60 days" },
+        { price: 15950, moq: "10 MT", leadTime: "10 days", terms: "TT Advance" },
+        { price: 15400, moq: "50 MT", leadTime: "30 days", terms: "LC 90 days" },
+        { price: 16100, moq: "5 MT", leadTime: "7 days", terms: "TT 30 days" },
+        { price: 15750, moq: "30 MT", leadTime: "14 days", terms: "LC 45 days" },
+    ],
+    zinc: [
+        { price: 2700, moq: "100 MT", leadTime: "14 days", terms: "LC 60 days" },
+        { price: 2770, moq: "50 MT", leadTime: "7 days", terms: "TT Advance" },
+        { price: 2660, moq: "200 MT", leadTime: "25 days", terms: "LC 90 days" },
+        { price: 2790, moq: "25 MT", leadTime: "5 days", terms: "TT 15 days" },
+        { price: 2720, moq: "75 MT", leadTime: "14 days", terms: "LC 45 days" },
+    ],
+};
+
+function readVendors(): VendorInfo[] {
+    if (typeof window === "undefined") return [];
+    try {
+        const raw = window.localStorage.getItem("vendorInfo.v2");
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter(
+            (x: Partial<VendorInfo>) =>
+                typeof x?.vendorName === "string" &&
+                typeof x?.vendorWebsiteUrl === "string" &&
+                typeof x?.materialId === "string"
+        ) as VendorInfo[];
+    } catch {
+        return [];
+    }
+}
+
 /* ─── HELPERS ────────────────────────────────────────────────────────────────── */
 const fmt = (n: number | null | undefined): string => n?.toLocaleString("en-US") ?? "—";
 
@@ -202,6 +261,23 @@ export default function DashboardPage() {
     const [sel, setSel] = useState("copper");
     const [recs, setRecs] = useState<Recommendation[]>(RECS);
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [vendors, setVendors] = useState<VendorInfo[]>([]);
+
+    // Poll localStorage for vendor changes (so adding a vendor updates the comparison live)
+    const refreshVendors = useCallback(() => setVendors(readVendors()), []);
+    useEffect(() => {
+        refreshVendors();
+        const onStorage = (e: StorageEvent) => {
+            if (e.key === "vendorInfo.v2") refreshVendors();
+        };
+        window.addEventListener("storage", onStorage);
+        // Also poll because same-tab localStorage writes don't fire "storage"
+        const poll = setInterval(refreshVendors, 1500);
+        return () => {
+            window.removeEventListener("storage", onStorage);
+            clearInterval(poll);
+        };
+    }, [refreshVendors]);
 
     const calculateAdjustedPrice = (base: number, qty: number) => {
         // Bulk discount: 1% for every 200 units above 100, max 10%
@@ -678,6 +754,455 @@ export default function DashboardPage() {
                         </div>
                     </div>
                 </div>
+
+                {/* VENDOR PRICE COMPARISON — all sources */}
+                {(() => {
+                    const metalVendors = vendors.filter(v => v.materialId === sel);
+                    if (metalVendors.length === 0) return null;
+
+                    const vendorPrices = VENDOR_PRICES[sel] || [];
+
+                    // Build unified list: LME, Kitco, then each vendor
+                    type SourceCard = {
+                        key: string;
+                        label: string;
+                        type: "global" | "vendor";
+                        price: number;
+                        moq?: string;
+                        leadTime?: string;
+                        terms?: string;
+                    };
+
+                    const allSources: SourceCard[] = [
+                        { key: "lme", label: "LME.com", type: "global", price: metal.src1 },
+                        { key: "kitco", label: "Kitco", type: "global", price: metal.src2 },
+                        ...metalVendors.map((v, i) => {
+                            const pd = vendorPrices[i % vendorPrices.length];
+                            return {
+                                key: v.id,
+                                label: v.vendorName || `Vendor ${i + 1}`,
+                                type: "vendor" as const,
+                                price: pd.price,
+                                moq: pd.moq,
+                                leadTime: pd.leadTime,
+                                terms: pd.terms,
+                            };
+                        }),
+                    ];
+
+                    const lowestPrice = Math.min(...allSources.map(s => s.price));
+                    const highestPrice = Math.max(...allSources.map(s => s.price));
+                    const cheapestSource = allSources.find(s => s.price === lowestPrice)!;
+                    const lmePrice = metal.src1;
+
+                    return (
+                        <div
+                            className="dashboard-fade dashboard-fade2"
+                            style={{
+                                background: "var(--color-surface-raised)",
+                                border: "1px solid var(--color-surface-border)",
+                                borderRadius: "var(--radius-xl)",
+                                padding: "var(--space-20)",
+                                marginBottom: "var(--space-15)",
+                            }}
+                        >
+                            <div
+                                style={{
+                                    fontSize: "var(--text-xs)",
+                                    fontWeight: 700,
+                                    letterSpacing: 2,
+                                    textTransform: "uppercase",
+                                    color: "var(--color-text-muted)",
+                                    marginBottom: "var(--space-16)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "var(--space-8)",
+                                }}
+                            >
+                                <span style={{ color: "var(--color-primary)" }}>◆</span> Price Comparison · {metal.label} · All Sources
+                                <span
+                                    style={{
+                                        marginLeft: "auto",
+                                        fontSize: "var(--text-2xs)",
+                                        color: "var(--color-text-tertiary)",
+                                        fontFamily: "var(--font-sans)",
+                                        fontWeight: 400,
+                                        letterSpacing: 0,
+                                    }}
+                                >
+                                    {allSources.length} sources · Spread ${fmt(highestPrice - lowestPrice)}
+                                </span>
+                            </div>
+
+                            {/* All source cards in one grid */}
+                            <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(allSources.length, 4)}, 1fr)`, gap: "var(--space-10)" }}>
+                                {allSources.map((src) => {
+                                    const isCheapest = src.price === lowestPrice;
+                                    const diffFromLme = src.price - lmePrice;
+                                    const pctFromLme = ((diffFromLme / lmePrice) * 100).toFixed(1);
+                                    const isBelow = diffFromLme < 0;
+                                    const isGlobal = src.type === "global";
+
+                                    return (
+                                        <div
+                                            key={src.key}
+                                            style={{
+                                                background: isCheapest ? "var(--overlay-primary-05)" : "var(--color-bg)",
+                                                borderRadius: "var(--radius-lg)",
+                                                padding: "var(--space-16)",
+                                                border: `1px solid ${isCheapest ? "color-mix(in srgb, var(--color-primary) 45%, transparent)" : "var(--color-surface-border)"}`,
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                gap: "var(--space-8)",
+                                                position: "relative",
+                                            }}
+                                        >
+                                            {isCheapest && (
+                                                <div style={{
+                                                    position: "absolute", top: 8, right: 8,
+                                                    display: "flex", alignItems: "center", gap: 3,
+                                                    fontSize: 9, fontWeight: 700, letterSpacing: 1,
+                                                    color: "var(--color-primary)", fontFamily: "var(--font-sans)",
+                                                }}>
+                                                    <Award style={{ width: 12, height: 12 }} /> BEST
+                                                </div>
+                                            )}
+
+                                            {/* Source label + type badge */}
+                                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                                <div style={{
+                                                    fontSize: 9, letterSpacing: 2, textTransform: "uppercase",
+                                                    color: "var(--color-text-tertiary)", fontWeight: 700, fontFamily: "var(--font-sans)",
+                                                    maxWidth: "calc(100% - 60px)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                                                }}>
+                                                    {src.label}
+                                                </div>
+                                                <span style={{
+                                                    fontSize: 8, fontWeight: 700, letterSpacing: 1, fontFamily: "var(--font-sans)",
+                                                    padding: "1px 5px", borderRadius: 3,
+                                                    background: isGlobal ? "var(--color-chart-2)" : "var(--color-primary)",
+                                                    color: "var(--color-bg)",
+                                                    textTransform: "uppercase",
+                                                    flexShrink: 0,
+                                                }}>
+                                                    {isGlobal ? "GLOBAL" : "VENDOR"}
+                                                </span>
+                                            </div>
+
+                                            {/* Price */}
+                                            <div style={{
+                                                fontFamily: "var(--font-sans)", fontSize: "var(--text-2xl)",
+                                                fontWeight: 700, color: "var(--color-text-strong)",
+                                            }}>
+                                                ${fmt(src.price)}
+                                            </div>
+
+                                            {/* Diff vs LME (skip for LME itself) */}
+                                            {src.key !== "lme" ? (
+                                                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                                                    {isBelow ? (
+                                                        <TrendingDown style={{ width: 12, height: 12, color: "var(--color-success)" }} />
+                                                    ) : diffFromLme > 0 ? (
+                                                        <TrendingUp style={{ width: 12, height: 12, color: "var(--color-danger)" }} />
+                                                    ) : null}
+                                                    <span style={{
+                                                        fontSize: "var(--text-2xs)", fontWeight: 700, fontFamily: "var(--font-sans)",
+                                                        color: isBelow ? "var(--color-success)" : diffFromLme > 0 ? "var(--color-danger)" : "var(--color-text-muted)",
+                                                    }}>
+                                                        {diffFromLme === 0 ? "Same as LME" : `${isBelow ? "" : "+"}${pctFromLme}% vs LME`}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <div style={{ fontSize: "var(--text-2xs)", color: "var(--color-text-muted)", fontFamily: "var(--font-sans)" }}>
+                                                    {metal.unit} · Reference
+                                                </div>
+                                            )}
+
+                                            {/* Vendor-specific details */}
+                                            {!isGlobal && src.moq && (
+                                                <>
+                                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginTop: 2 }}>
+                                                        <div>
+                                                            <div style={{ fontSize: 8, color: "var(--color-text-tertiary)", letterSpacing: 1, fontWeight: 700, fontFamily: "var(--font-sans)", textTransform: "uppercase" }}>MOQ</div>
+                                                            <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-muted)", fontFamily: "var(--font-sans)", fontWeight: 600, marginTop: 1 }}>{src.moq}</div>
+                                                        </div>
+                                                        <div>
+                                                            <div style={{ fontSize: 8, color: "var(--color-text-tertiary)", letterSpacing: 1, fontWeight: 700, fontFamily: "var(--font-sans)", textTransform: "uppercase" }}>LEAD TIME</div>
+                                                            <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-muted)", fontFamily: "var(--font-sans)", fontWeight: 600, marginTop: 1 }}>{src.leadTime}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div style={{
+                                                        fontSize: "var(--text-2xs)", color: "var(--color-text-tertiary)",
+                                                        fontFamily: "var(--font-sans)",
+                                                    }}>
+                                                        {src.terms}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {/* ── Ranked comparison table ── */}
+                            {(() => {
+                                const sorted = [...allSources].sort((a, b) => a.price - b.price);
+                                return (
+                                    <div style={{ marginTop: "var(--space-16)" }}>
+                                        <div style={{
+                                            fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: 2,
+                                            textTransform: "uppercase", color: "var(--color-text-muted)",
+                                            marginBottom: "var(--space-10)", display: "flex", alignItems: "center", gap: "var(--space-8)",
+                                        }}>
+                                            <span style={{ color: "var(--color-primary)" }}>◆</span> Ranked Price Table
+                                        </div>
+
+                                        {/* Header */}
+                                        <div style={{
+                                            display: "grid",
+                                            gridTemplateColumns: "32px 1.2fr 0.8fr 0.7fr 0.7fr 1.5fr",
+                                            gap: "var(--space-8)",
+                                            padding: "var(--space-8) var(--space-12)",
+                                            borderBottom: "1px solid var(--color-surface-border)",
+                                        }}>
+                                            {["#", "SOURCE", "PRICE", "VS LME", "VS BEST", "PRICE RANGE"].map(h => (
+                                                <div key={h} style={{
+                                                    fontSize: 8, fontWeight: 700, letterSpacing: 1.5,
+                                                    color: "var(--color-text-tertiary)", fontFamily: "var(--font-sans)",
+                                                    textTransform: "uppercase",
+                                                }}>
+                                                    {h}
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Rows */}
+                                        {sorted.map((src, rank) => {
+                                            const diffLme = src.price - lmePrice;
+                                            const pctLme = ((diffLme / lmePrice) * 100).toFixed(1);
+                                            const diffBest = src.price - lowestPrice;
+                                            const pctBest = ((diffBest / lowestPrice) * 100).toFixed(1);
+                                            // Bar width: 0% at cheapest, 100% at most expensive
+                                            const barPct = highestPrice === lowestPrice ? 100 : ((src.price - lowestPrice) / (highestPrice - lowestPrice)) * 100;
+                                            const isBest = rank === 0;
+
+                                            return (
+                                                <div
+                                                    key={src.key}
+                                                    style={{
+                                                        display: "grid",
+                                                        gridTemplateColumns: "32px 1.2fr 0.8fr 0.7fr 0.7fr 1.5fr",
+                                                        gap: "var(--space-8)",
+                                                        padding: "var(--space-10) var(--space-12)",
+                                                        borderBottom: "1px solid var(--color-surface-border)",
+                                                        background: isBest ? "var(--overlay-primary-05)" : "transparent",
+                                                        alignItems: "center",
+                                                    }}
+                                                >
+                                                    {/* Rank */}
+                                                    <div style={{
+                                                        fontSize: "var(--text-sm)", fontWeight: 700,
+                                                        fontFamily: "var(--font-sans)",
+                                                        color: isBest ? "var(--color-primary)" : "var(--color-text-muted)",
+                                                    }}>
+                                                        {rank + 1}
+                                                    </div>
+
+                                                    {/* Source name + badge */}
+                                                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                                        <span style={{
+                                                            fontSize: "var(--text-sm)", fontWeight: 600,
+                                                            color: "var(--color-text-strong)", fontFamily: "var(--font-sans)",
+                                                            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                                                        }}>
+                                                            {src.label}
+                                                        </span>
+                                                        <span style={{
+                                                            fontSize: 7, fontWeight: 700, letterSpacing: 1, fontFamily: "var(--font-sans)",
+                                                            padding: "1px 4px", borderRadius: 3, flexShrink: 0,
+                                                            background: src.type === "global" ? "var(--color-chart-2)" : "var(--color-primary)",
+                                                            color: "var(--color-bg)", textTransform: "uppercase",
+                                                        }}>
+                                                            {src.type === "global" ? "GLB" : "VND"}
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Price */}
+                                                    <div style={{
+                                                        fontSize: "var(--text-sm)", fontWeight: 700,
+                                                        fontFamily: "var(--font-sans)", color: "var(--color-text-strong)",
+                                                    }}>
+                                                        ${fmt(src.price)}
+                                                    </div>
+
+                                                    {/* vs LME */}
+                                                    <div style={{
+                                                        fontSize: "var(--text-2xs)", fontWeight: 700, fontFamily: "var(--font-sans)",
+                                                        color: diffLme < 0 ? "var(--color-success)" : diffLme > 0 ? "var(--color-danger)" : "var(--color-text-muted)",
+                                                    }}>
+                                                        {src.key === "lme" ? "—" : `${diffLme < 0 ? "" : "+"}${pctLme}%`}
+                                                    </div>
+
+                                                    {/* vs Best */}
+                                                    <div style={{
+                                                        fontSize: "var(--text-2xs)", fontWeight: 700, fontFamily: "var(--font-sans)",
+                                                        color: diffBest === 0 ? "var(--color-primary)" : "var(--color-text-muted)",
+                                                    }}>
+                                                        {diffBest === 0 ? "BEST" : `+$${fmt(diffBest)}`}
+                                                    </div>
+
+                                                    {/* Visual bar */}
+                                                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                                        <div style={{
+                                                            flex: 1, height: 6, background: "var(--color-bg)",
+                                                            borderRadius: 3, overflow: "hidden",
+                                                            border: "1px solid var(--color-surface-border)",
+                                                        }}>
+                                                            <div style={{
+                                                                height: "100%",
+                                                                width: `${Math.max(barPct, 4)}%`,
+                                                                borderRadius: 3,
+                                                                background: isBest
+                                                                    ? "var(--color-primary)"
+                                                                    : barPct > 60
+                                                                        ? "var(--color-danger)"
+                                                                        : "var(--color-chart-2)",
+                                                                transition: "width 0.3s ease",
+                                                            }} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                );
+                            })()}
+
+                            {/* ── Cross-comparison matrix (vendor vs vendor) ── */}
+                            {allSources.length > 2 && (() => {
+                                const vendorOnly = allSources.filter(s => s.type === "vendor");
+                                if (vendorOnly.length < 2) return null;
+                                const all = allSources; // include globals too
+                                return (
+                                    <div style={{ marginTop: "var(--space-16)" }}>
+                                        <div style={{
+                                            fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: 2,
+                                            textTransform: "uppercase", color: "var(--color-text-muted)",
+                                            marginBottom: "var(--space-10)", display: "flex", alignItems: "center", gap: "var(--space-8)",
+                                        }}>
+                                            <span style={{ color: "var(--color-primary)" }}>◆</span> Cross-Source Price Difference ($/MT)
+                                        </div>
+
+                                        <div style={{ overflowX: "auto" }}>
+                                            <table style={{
+                                                width: "100%", borderCollapse: "collapse",
+                                                fontSize: "var(--text-xs)", fontFamily: "var(--font-sans)",
+                                            }}>
+                                                <thead>
+                                                    <tr>
+                                                        <th style={{
+                                                            padding: "var(--space-8) var(--space-10)", textAlign: "left",
+                                                            fontSize: 8, fontWeight: 700, letterSpacing: 1.5,
+                                                            color: "var(--color-text-tertiary)", textTransform: "uppercase",
+                                                            borderBottom: "1px solid var(--color-surface-border)",
+                                                        }}>
+                                                        </th>
+                                                        {all.map(s => (
+                                                            <th key={s.key} style={{
+                                                                padding: "var(--space-8) var(--space-10)", textAlign: "center",
+                                                                fontSize: 8, fontWeight: 700, letterSpacing: 1.5,
+                                                                color: "var(--color-text-tertiary)", textTransform: "uppercase",
+                                                                borderBottom: "1px solid var(--color-surface-border)",
+                                                                maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                                                            }}>
+                                                                {s.label}
+                                                            </th>
+                                                        ))}
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {all.map(row => (
+                                                        <tr key={row.key}>
+                                                            <td style={{
+                                                                padding: "var(--space-8) var(--space-10)",
+                                                                fontWeight: 600, color: "var(--color-text-strong)",
+                                                                borderBottom: "1px solid var(--color-surface-border)",
+                                                                whiteSpace: "nowrap", fontSize: "var(--text-xs)",
+                                                            }}>
+                                                                {row.label}
+                                                            </td>
+                                                            {all.map(col => {
+                                                                if (row.key === col.key) {
+                                                                    return (
+                                                                        <td key={col.key} style={{
+                                                                            padding: "var(--space-8) var(--space-10)",
+                                                                            textAlign: "center",
+                                                                            borderBottom: "1px solid var(--color-surface-border)",
+                                                                            background: "var(--color-surface-raised)",
+                                                                            color: "var(--color-text-tertiary)",
+                                                                        }}>
+                                                                            —
+                                                                        </td>
+                                                                    );
+                                                                }
+                                                                const diff = row.price - col.price;
+                                                                const isNeg = diff < 0;
+                                                                return (
+                                                                    <td key={col.key} style={{
+                                                                        padding: "var(--space-8) var(--space-10)",
+                                                                        textAlign: "center", fontWeight: 700,
+                                                                        borderBottom: "1px solid var(--color-surface-border)",
+                                                                        color: isNeg ? "var(--color-success)" : diff > 0 ? "var(--color-danger)" : "var(--color-text-muted)",
+                                                                    }}>
+                                                                        {isNeg ? "−" : "+"}${fmt(Math.abs(diff))}
+                                                                    </td>
+                                                                );
+                                                            })}
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+
+                            {/* Summary bar */}
+                            <div
+                                style={{
+                                    marginTop: "var(--space-16)",
+                                    padding: "var(--space-10) var(--space-15)",
+                                    background: "var(--color-bg)",
+                                    borderRadius: "var(--radius-md)",
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    border: "1px solid var(--color-surface-border)",
+                                }}
+                            >
+                                <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-muted)", fontFamily: "var(--font-sans)" }}>
+                                    Best price across all sources
+                                </span>
+                                <span
+                                    style={{
+                                        fontSize: "var(--text-label)",
+                                        fontWeight: 700,
+                                        fontFamily: "var(--font-sans)",
+                                        color: "var(--color-primary)",
+                                    }}
+                                >
+                                    ${fmt(lowestPrice)}/MT · {cheapestSource.label}
+                                    {cheapestSource.key !== "lme" && (() => {
+                                        const saving = lmePrice - lowestPrice;
+                                        return saving > 0
+                                            ? ` · Save $${fmt(saving)} vs LME`
+                                            : "";
+                                    })()}
+                                </span>
+                            </div>
+                        </div>
+                    );
+                })()}
 
                 {/* ROW 2: Procurement */}
                 <div

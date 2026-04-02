@@ -5,7 +5,7 @@ export const LANGFLOW_BASE_URL =
 
 export const LANGFLOW_FLOW_ID =
     process.env.NEXT_PUBLIC_FLOW_ID ||
-    "ee71682c-bfc5-4aec-a919-c6373742d5a2";
+    "d83ca19c-6ef1-4a1b-a8cd-d4f83c496e91";
 
 export const AGENT_KEY =
     process.env.NEXT_PUBLIC_AGENT_KEY ||
@@ -17,3 +17,4 @@ export const API_URL_QUERY = {
     SEND_QUERY: BASE_BOT_URL,
     AGENT_KEY: AGENT_KEY,
 };
+

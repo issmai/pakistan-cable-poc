@@ -1,17 +1,15 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send } from "lucide-react";
+import { Send, AlertTriangle, ExternalLink } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
 import { cn } from "@/lib/utils";
-import axios from "axios";
-import { AGENT_KEY, API_URL_QUERY } from "@/config/api-routes";
 import { Streamdown } from "streamdown";
 import { mermaid } from "@streamdown/mermaid";
 import { math } from "@streamdown/math";
@@ -20,12 +18,85 @@ import { cjk } from "@streamdown/cjk";
 // Import KaTeX styles for math rendering
 import 'katex/dist/katex.min.css';
 
-
 type Message = {
   id: string;
   role: "user" | "assistant";
   content: string;
 };
+
+type VendorInfo = {
+  id: string;
+  createdAtISO: string;
+  vendorName: string;
+  vendorWebsiteUrl: string;
+  materialId: string;
+};
+
+/* ── Hardcoded vendor prices (same as dashboard) ── */
+const VENDOR_PRICES: Record<string, { price: number; moq: string; leadTime: string; terms: string }[]> = {
+  copper: [
+    { price: 9280, moq: "50 MT", leadTime: "14 days", terms: "LC 60 days" },
+    { price: 9350, moq: "25 MT", leadTime: "7 days", terms: "TT Advance" },
+    { price: 9190, moq: "100 MT", leadTime: "21 days", terms: "LC 90 days" },
+    { price: 9440, moq: "10 MT", leadTime: "5 days", terms: "TT 30 days" },
+    { price: 9310, moq: "75 MT", leadTime: "18 days", terms: "LC 45 days" },
+  ],
+  aluminium: [
+    { price: 2240, moq: "100 MT", leadTime: "10 days", terms: "LC 30 days" },
+    { price: 2310, moq: "50 MT", leadTime: "7 days", terms: "TT Advance" },
+    { price: 2195, moq: "200 MT", leadTime: "28 days", terms: "LC 90 days" },
+    { price: 2275, moq: "25 MT", leadTime: "5 days", terms: "TT 15 days" },
+    { price: 2260, moq: "75 MT", leadTime: "14 days", terms: "LC 60 days" },
+  ],
+  nickel: [
+    { price: 15600, moq: "20 MT", leadTime: "21 days", terms: "LC 60 days" },
+    { price: 15950, moq: "10 MT", leadTime: "10 days", terms: "TT Advance" },
+    { price: 15400, moq: "50 MT", leadTime: "30 days", terms: "LC 90 days" },
+    { price: 16100, moq: "5 MT", leadTime: "7 days", terms: "TT 30 days" },
+    { price: 15750, moq: "30 MT", leadTime: "14 days", terms: "LC 45 days" },
+  ],
+  zinc: [
+    { price: 2700, moq: "100 MT", leadTime: "14 days", terms: "LC 60 days" },
+    { price: 2770, moq: "50 MT", leadTime: "7 days", terms: "TT Advance" },
+    { price: 2660, moq: "200 MT", leadTime: "25 days", terms: "LC 90 days" },
+    { price: 2790, moq: "25 MT", leadTime: "5 days", terms: "TT 15 days" },
+    { price: 2720, moq: "75 MT", leadTime: "14 days", terms: "LC 45 days" },
+  ],
+};
+
+function getVendors(): VendorInfo[] {
+  try {
+    const raw = localStorage.getItem("vendorInfo.v2");
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (x: Partial<VendorInfo>) =>
+        typeof x?.vendorName === "string" &&
+        typeof x?.vendorWebsiteUrl === "string" &&
+        typeof x?.materialId === "string"
+    ) as VendorInfo[];
+  } catch {
+    return [];
+  }
+}
+
+function buildVendorContext(vendors: VendorInfo[]): string {
+  if (vendors.length === 0) return "";
+  const lines: string[] = [];
+  vendors.forEach((v, i) => {
+    const prices = VENDOR_PRICES[v.materialId];
+    const pd = prices?.[i % (prices?.length || 1)];
+    lines.push(
+      `- **${v.vendorName || "Unnamed vendor"}** | Material: ${v.materialId} | Website: ${v.vendorWebsiteUrl} | Price: $${pd?.price?.toLocaleString() ?? "N/A"}/MT | MOQ: ${pd?.moq ?? "N/A"} | Lead Time: ${pd?.leadTime ?? "N/A"} | Terms: ${pd?.terms ?? "N/A"}`
+    );
+  });
+  return lines.join("\n");
+}
+
+function hasVendorUrl(vendors: VendorInfo[]): boolean {
+  return vendors.some((v) => v.vendorWebsiteUrl && v.vendorWebsiteUrl.trim().length > 0);
+}
 
 const LOADING_MESSAGES = [
   "Thinking...",
@@ -46,6 +117,17 @@ export function ChatScreen({ className }: { className?: string }) {
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [vendorList, setVendorList] = useState<VendorInfo[]>([]);
+
+  const refreshVendors = useCallback(() => {
+    setVendorList(getVendors());
+  }, []);
+
+  useEffect(() => {
+    refreshVendors();
+  }, [refreshVendors]);
+
+  const hasUrl = hasVendorUrl(vendorList);
 
   const normalizeAssistantMessage = (text: string): string => {
     // If the backend returns escaped newlines (\"\\n\"), convert them to real line breaks
@@ -96,27 +178,26 @@ export function ChatScreen({ className }: { className?: string }) {
     setIsSending(true);
     setLoading(true);
 
-    console.log("AGENT_KEY---->", AGENT_KEY);
-
     try {
-      const response = await axios.post(
-        API_URL_QUERY.SEND_QUERY,
-        {
-          output_type: "chat",
-          input_type: "chat",
+      const freshVendors = getVendors();
+      const vendorContext = buildVendorContext(freshVendors);
+
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           input_value: trimmed,
           session_id: convoID,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": AGENT_KEY,
-          },
-        }
-      );
+          vendor_context: vendorContext || undefined,
+        }),
+      });
+
+      if (!response.ok) throw new Error(`API error: ${response.status}`);
+      const data = await response.json();
 
       const rawReplyText =
-        response.data?.outputs?.[0]?.outputs?.[0]?.messages?.[0]?.message ||
+        data?.message ||
+        data?.outputs?.[0]?.outputs?.[0]?.messages?.[0]?.message ||
         "Sorry, I am unable to process your request.";
 
       const replyText = normalizeAssistantMessage(rawReplyText);
@@ -183,22 +264,29 @@ export function ChatScreen({ className }: { className?: string }) {
                 transition={{ duration: 0.4 }}
               >
                 <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
-                  Chat with Indus AI Buddy
+                  Chat with Assistant
                 </h2>
                 <p className="text-sm text-muted-foreground sm:text-base">
-                  Ask anything — get answers about Pakistan&apos;s national AI platform, policies, and innovation.
+                  Ask about procurement trends, pricing analysis, inventory forecasts, and more.
                 </p>
-                <p className="text-xs text-muted-foreground/90 sm:text-sm">
-                  Get to know about Indus AI Week, events, talent, and more. Start by typing a message below.
-                </p>
-                <a
-                  href="https://indusai.gov.pk"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block text-sm font-medium text-primary underline-offset-4 hover:underline"
-                >
-                  indusai.gov.pk
-                </a>
+
+                {/* Vendor status banner */}
+                {hasUrl ? (
+                  <div className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
+                    <ExternalLink className="h-3.5 w-3.5 shrink-0 text-primary" />
+                    <span className="text-muted-foreground">
+                      {vendorList.length} vendor{vendorList.length > 1 ? "s" : ""} loaded
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/5 px-3 py-2 text-sm">
+                    <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-yellow-500" />
+                    <span className="text-muted-foreground">
+                      No vendor link found. Add a vendor with a website URL in the{" "}
+                      <span className="font-medium text-foreground">Vendor Info</span> tab to get started.
+                    </span>
+                  </div>
+                )}
               </motion.div>
             </div>
           ) : (
@@ -282,9 +370,9 @@ export function ChatScreen({ className }: { className?: string }) {
                       handleSubmit(e as unknown as React.FormEvent);
                     }
                   }}
-                  placeholder="Ask anything..."
+                  placeholder={hasUrl ? "Ask anything..." : "Add a vendor link to start chatting..."}
                   rows={1}
-                  disabled={isSending}
+                  disabled={isSending || !hasUrl}
                   className={cn(
                     "w-full resize-none transition-all duration-300 text-[16px]",
                     "py-2.5 px-3 pr-12 min-h-[44px] max-h-[160px] rounded-xl",
